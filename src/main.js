@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createNestServer = void 0;
+const core_1 = require("@nestjs/core");
+const platform_express_1 = require("@nestjs/platform-express");
+const app_module_1 = require("./app.module");
+const helmet_1 = require("helmet");
+const port = process.env.PORT || 4000;
+async function bootstrap() {
+    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors({
+        origin: (req, callback) => callback(null, true),
+    });
+    app.use((0, helmet_1.default)());
+    await app.listen(port);
+}
+// Если приложение запускается локально, выполнить bootstrap
+if (!process.env.AWS_EXECUTION_ENV) {
+    bootstrap().then(() => {
+        console.log('App is running on %s port', port);
+    });
+}
+const createNestServer = async (expressInstance) => {
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(expressInstance));
+    app.enableCors({
+        origin: (req, callback) => callback(null, true),
+    });
+    app.use((0, helmet_1.default)());
+    await app.init();
+    return app;
+};
+exports.createNestServer = createNestServer;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIm1haW4udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQUEsdUNBQTJDO0FBQzNDLCtEQUEwRDtBQUMxRCw2Q0FBeUM7QUFDekMsbUNBQTRCO0FBRTVCLE1BQU0sSUFBSSxHQUFHLE9BQU8sQ0FBQyxHQUFHLENBQUMsSUFBSSxJQUFJLElBQUksQ0FBQztBQUV0QyxLQUFLLFVBQVUsU0FBUztJQUN0QixNQUFNLEdBQUcsR0FBRyxNQUFNLGtCQUFXLENBQUMsTUFBTSxDQUFDLHNCQUFTLENBQUMsQ0FBQztJQUVoRCxHQUFHLENBQUMsVUFBVSxDQUFDO1FBQ2IsTUFBTSxFQUFFLENBQUMsR0FBRyxFQUFFLFFBQVEsRUFBRSxFQUFFLENBQUMsUUFBUSxDQUFDLElBQUksRUFBRSxJQUFJLENBQUM7S0FDaEQsQ0FBQyxDQUFDO0lBQ0gsR0FBRyxDQUFDLEdBQUcsQ0FBQyxJQUFBLGdCQUFNLEdBQUUsQ0FBQyxDQUFDO0lBRWxCLE1BQU0sR0FBRyxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsQ0FBQztBQUN6QixDQUFDO0FBRUQsNERBQTREO0FBQzVELElBQUksQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLGlCQUFpQixFQUFFLENBQUM7SUFDbkMsU0FBUyxFQUFFLENBQUMsSUFBSSxDQUFDLEdBQUcsRUFBRTtRQUNwQixPQUFPLENBQUMsR0FBRyxDQUFDLDJCQUEyQixFQUFFLElBQUksQ0FBQyxDQUFDO0lBQ2pELENBQUMsQ0FBQyxDQUFDO0FBQ0wsQ0FBQztBQUVNLE1BQU0sZ0JBQWdCLEdBQUcsS0FBSyxFQUFFLGVBQWUsRUFBRSxFQUFFO0lBQ3hELE1BQU0sR0FBRyxHQUFHLE1BQU0sa0JBQVcsQ0FBQyxNQUFNLENBQUMsc0JBQVMsRUFBRSxJQUFJLGlDQUFjLENBQUMsZUFBZSxDQUFDLENBQUMsQ0FBQztJQUNyRixHQUFHLENBQUMsVUFBVSxDQUFDO1FBQ2IsTUFBTSxFQUFFLENBQUMsR0FBRyxFQUFFLFFBQVEsRUFBRSxFQUFFLENBQUMsUUFBUSxDQUFDLElBQUksRUFBRSxJQUFJLENBQUM7S0FDaEQsQ0FBQyxDQUFDO0lBQ0gsR0FBRyxDQUFDLEdBQUcsQ0FBQyxJQUFBLGdCQUFNLEdBQUUsQ0FBQyxDQUFDO0lBQ2xCLE1BQU0sR0FBRyxDQUFDLElBQUksRUFBRSxDQUFDO0lBQ2pCLE9BQU8sR0FBRyxDQUFDO0FBQ2IsQ0FBQyxDQUFDO0FBUlcsUUFBQSxnQkFBZ0Isb0JBUTNCIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTmVzdEZhY3RvcnkgfSBmcm9tICdAbmVzdGpzL2NvcmUnO1xyXG5pbXBvcnQgeyBFeHByZXNzQWRhcHRlciB9IGZyb20gJ0BuZXN0anMvcGxhdGZvcm0tZXhwcmVzcyc7XHJcbmltcG9ydCB7IEFwcE1vZHVsZSB9IGZyb20gJy4vYXBwLm1vZHVsZSc7XHJcbmltcG9ydCBoZWxtZXQgZnJvbSAnaGVsbWV0JztcclxuXHJcbmNvbnN0IHBvcnQgPSBwcm9jZXNzLmVudi5QT1JUIHx8IDQwMDA7XHJcblxyXG5hc3luYyBmdW5jdGlvbiBib290c3RyYXAoKSB7XHJcbiAgY29uc3QgYXBwID0gYXdhaXQgTmVzdEZhY3RvcnkuY3JlYXRlKEFwcE1vZHVsZSk7XHJcblxyXG4gIGFwcC5lbmFibGVDb3JzKHtcclxuICAgIG9yaWdpbjogKHJlcSwgY2FsbGJhY2spID0+IGNhbGxiYWNrKG51bGwsIHRydWUpLFxyXG4gIH0pO1xyXG4gIGFwcC51c2UoaGVsbWV0KCkpO1xyXG5cclxuICBhd2FpdCBhcHAubGlzdGVuKHBvcnQpO1xyXG59XHJcblxyXG4vLyDQldGB0LvQuCDQv9GA0LjQu9C+0LbQtdC90LjQtSDQt9Cw0L/Rg9GB0LrQsNC10YLRgdGPINC70L7QutCw0LvRjNC90L4sINCy0YvQv9C+0LvQvdC40YLRjCBib290c3RyYXBcclxuaWYgKCFwcm9jZXNzLmVudi5BV1NfRVhFQ1VUSU9OX0VOVikge1xyXG4gIGJvb3RzdHJhcCgpLnRoZW4oKCkgPT4ge1xyXG4gICAgY29uc29sZS5sb2coJ0FwcCBpcyBydW5uaW5nIG9uICVzIHBvcnQnLCBwb3J0KTtcclxuICB9KTtcclxufVxyXG5cclxuZXhwb3J0IGNvbnN0IGNyZWF0ZU5lc3RTZXJ2ZXIgPSBhc3luYyAoZXhwcmVzc0luc3RhbmNlKSA9PiB7XHJcbiAgY29uc3QgYXBwID0gYXdhaXQgTmVzdEZhY3RvcnkuY3JlYXRlKEFwcE1vZHVsZSwgbmV3IEV4cHJlc3NBZGFwdGVyKGV4cHJlc3NJbnN0YW5jZSkpO1xyXG4gIGFwcC5lbmFibGVDb3JzKHtcclxuICAgIG9yaWdpbjogKHJlcSwgY2FsbGJhY2spID0+IGNhbGxiYWNrKG51bGwsIHRydWUpLFxyXG4gIH0pO1xyXG4gIGFwcC51c2UoaGVsbWV0KCkpO1xyXG4gIGF3YWl0IGFwcC5pbml0KCk7XHJcbiAgcmV0dXJuIGFwcDtcclxufTtcclxuIl19
