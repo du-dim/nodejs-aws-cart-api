@@ -56,7 +56,7 @@ export class CdkAppStack extends cdk.Stack {
     // Создание Lambda функции
     const cartServiceLambda = new lambda.Function(this, 'CartServiceLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'cartlambda.handler',
+      handler: 'lambda.handler',
       code: lambda.Code.fromAsset('../dist'),
       environment: {
         DB_HOST: dbInstance.instanceEndpoint.hostname,
@@ -70,11 +70,23 @@ export class CdkAppStack extends cdk.Stack {
     // Разрешение доступа Lambda к секретам и RDS
     dbPasswordSecret.grantRead(cartServiceLambda);
     dbInstance.connections.allowDefaultPortFrom(cartServiceLambda);
+    // dbInstance.grantConnect(cartServiceLambda)
+    const api = new apigateway.RestApi(this, "CartServiceApi", {
+      deploy: true,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders:apigateway.Cors.DEFAULT_HEADERS,
+      }
+    });
 
     // Создание API Gateway и связывание с Lambda
-    new apigateway.LambdaRestApi(this, 'CartServiceApi', {
-      handler: cartServiceLambda,
-      proxy: true,
+    api.root.addProxy({
+      defaultIntegration: new apigateway.LambdaIntegration(cartServiceLambda, { proxy: true }),
+    });
+
+    new cdk.CfnOutput(this, "CartServiceApiUrl", {
+      value: api.url,
     });
   }
 }

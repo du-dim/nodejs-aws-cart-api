@@ -26,6 +26,7 @@
     "@nestjs/common": "^10.3.10",
     "@nestjs/core": "^10.3.10",
     "@nestjs/platform-express": "^10.3.10",
+    "@vendia/serverless-express": "^4.12.6",
     "aws-cdk-lib": "2.146.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1664.0",
