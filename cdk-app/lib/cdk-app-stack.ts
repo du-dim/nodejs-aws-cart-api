@@ -48,13 +48,13 @@ export class CdkAppStack extends cdk.Stack {
       deleteAutomatedBackups: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       deletionProtection: false,
-      databaseName: 'CartServiceDB',
+      databaseName: 'NestServiceDB',
       securityGroups: [rdsSecurityGroup],
       publiclyAccessible: true,
     });
 
     // Создание Lambda функции
-    const cartServiceLambda = new lambda.Function(this, 'CartServiceLambda', {
+    const nestServiceLambda = new lambda.Function(this, 'NestServiceLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset('../dist'),
@@ -68,10 +68,10 @@ export class CdkAppStack extends cdk.Stack {
     });
 
     // Разрешение доступа Lambda к секретам и RDS
-    dbPasswordSecret.grantRead(cartServiceLambda);
-    dbInstance.connections.allowDefaultPortFrom(cartServiceLambda);
-    // dbInstance.grantConnect(cartServiceLambda)
-    const api = new apigateway.RestApi(this, "CartServiceApi", {
+    dbPasswordSecret.grantRead(nestServiceLambda);
+    dbInstance.connections.allowDefaultPortFrom(nestServiceLambda);
+    // dbInstance.grantConnect(nestServiceLambda)
+    const api = new apigateway.RestApi(this, "NestServiceApi", {
       deploy: true,
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
@@ -82,10 +82,10 @@ export class CdkAppStack extends cdk.Stack {
 
     // Создание API Gateway и связывание с Lambda
     api.root.addProxy({
-      defaultIntegration: new apigateway.LambdaIntegration(cartServiceLambda, { proxy: true }),
+      defaultIntegration: new apigateway.LambdaIntegration(nestServiceLambda, { proxy: true }),
     });
 
-    new cdk.CfnOutput(this, "CartServiceApiUrl", {
+    new cdk.CfnOutput(this, "NestServiceApiUrl", {
       value: api.url,
     });
   }
