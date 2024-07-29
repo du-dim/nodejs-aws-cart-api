@@ -15,6 +15,14 @@ export class CdkAppStack extends cdk.Stack {
       maxAzs: 2, // Количество AZ для высокой доступности
     });
 
+    // Создание Security Group для RDS
+    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RDSSecurityGroup', {
+      vpc,
+      allowAllOutbound: true,
+    });
+
+    rdsSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(5432), 'Allow PostgreSQL traffic');
+
     // Создание секрета для хранения пароля RDS
     const dbPasswordSecret = new secretsmanager.Secret(this, 'DBPasswordSecret', {
       generateSecretString: {
@@ -41,12 +49,14 @@ export class CdkAppStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       deletionProtection: false,
       databaseName: 'CartServiceDB',
+      securityGroups: [rdsSecurityGroup],
+      publiclyAccessible: true,
     });
 
     // Создание Lambda функции
     const cartServiceLambda = new lambda.Function(this, 'CartServiceLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'cart-lambda.handler',
+      handler: 'cartlambda.handler',
       code: lambda.Code.fromAsset('../dist'),
       environment: {
         DB_HOST: dbInstance.instanceEndpoint.hostname,

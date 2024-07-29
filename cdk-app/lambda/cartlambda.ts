@@ -36,7 +36,8 @@ export const handler: Handler = async (event: APIGatewayEvent, context: Context,
     }
 
     const secrets = await getSecretValue(secretName);
-    process.env.DB_PASSWORD = secrets.password;
+    console.log(secrets.password)
+    process.env.DB_PASSWORD = secrets.password;   
     cachedServer = await bootstrapServer();
   }
   return awsServerlessExpress.proxy(cachedServer, event, context, 'PROMISE').promise;
